@@ -6,7 +6,7 @@
 import clr, codecs, json, os, re, sys, threading, datetime
 
 clr.AddReference("IronPython.Modules.dll")
-clr.AddReferenceToFileAndPath(os.path.join(os.path.dirname(__file__) + "\References", "TwitchLib.PubSub.dll"))
+clr.AddReferenceToFileAndPath(os.path.join(os.path.dirname(os.path.realpath(__file__)) + "\References", "TwitchLib.PubSub.dll"))
 from TwitchLib.PubSub import TwitchPubSub
 
 #---------------------------
