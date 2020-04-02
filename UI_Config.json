@@ -7,6 +7,21 @@
 		"tooltip": "This specifies the Twitch channel that the script should watch for channel point reward redemptions on.",
 		"group": ""
 	},
+	"TwitchOAuthToken": {
+		"type": "textbox",
+		"value": "",
+		"label": "Twitch oAuth Token",
+		"tooltip": "Enter an oAuth token that allows the bot to read channel point redemptions on the channel being watched.",
+		"group": "Twitch oAuth - KEEP HIDDEN"
+	},
+	"btnGetToken": {
+		"type": "button",
+		"label": "Get Token",
+		"tooltip": "Generate an oAuth Token for the watched twitch account with permissions to read channel point redemptions.",
+		"wsevent": "",
+		"function": "GetToken",
+		"group": "Twitch oAuth - KEEP HIDDEN"
+	},
 	"TwitchReward1Name": {
 		"type": "textbox",
 		"value": "",

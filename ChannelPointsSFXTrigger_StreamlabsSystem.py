@@ -39,6 +39,7 @@ class Settings(object):
         else:
             self.EnableDebug = False
             self.Username = ""
+            self.TwitchOAuthToken = ""
             self.TwitchReward1Name = ""
             self.SFX1Path = ""
             self.SFX1Volume = 100
@@ -102,24 +103,27 @@ def Start():
 def EventReceiverConnected(sender, e):
 
     #get channel id for username
-    headers = { 'Client-ID': 'icyqwwpy744ugu5x4ymyt6jqrnpxso' }
+    headers = { 
+        'Client-ID': 'icyqwwpy744ugu5x4ymyt6jqrnpxso', 
+        "Authorization": "Bearer " + ScriptSettings.TwitchOAuthToken[6:]
+    }
     result = json.loads(Parent.GetRequest("https://api.twitch.tv/helix/users?login=" + ScriptSettings.Username,headers))
     user = json.loads(result["response"])
     id = user["data"][0]["id"]
 
     if ScriptSettings.EnableDebug:
-        Parent.Log(ScriptName, "Event receiver connected, sending topics for channel id: " + id);
+        Parent.Log(ScriptName, "Event receiver connected, sending topics for channel id: " + id)
 
     EventReceiver.ListenToRewards(id)
-    EventReceiver.SendTopics()
+    EventReceiver.SendTopics(ScriptSettings.TwitchOAuthToken)
     return
 
 def EventReceiverListenResponse(sender, e):
     if ScriptSettings.EnableDebug:
         if e.Successful:
-            Parent.Log(ScriptName, "Successfully verified listening to topic: " + e.Topic);
+            Parent.Log(ScriptName, "Successfully verified listening to topic: " + e.Topic)
         else:
-            Parent.Log(ScriptName, "Failed to listen! Error: " + e.Response.Error);
+            Parent.Log(ScriptName, "Failed to listen! Error: " + e.Response.Error)
     return
 
 def EventReceiverRewardRedeemed(sender, e):
@@ -225,5 +229,8 @@ def Unload():
 def ScriptToggled(state):
     return
 
-def openreadme():
+def OpenReadme():
     os.startfile(ReadMe)
+
+def GetToken():
+	os.startfile("https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=icyqwwpy744ugu5x4ymyt6jqrnpxso&redirect_uri=https://twitchapps.com/tmi/&scope=channel:read:redemptions&force_verify=true")
