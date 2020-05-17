@@ -38,7 +38,6 @@ class Settings(object):
                 self.__dict__ = json.load(f, encoding="utf-8")
         else:
             self.EnableDebug = False
-            self.Username = ""
             self.TwitchOAuthToken = ""
             self.TwitchReward1Name = ""
             self.SFX1Path = ""
@@ -95,16 +94,23 @@ def Start():
     global EventReceiver
     EventReceiver = TwitchPubSub()
     EventReceiver.OnPubSubServiceConnected += EventReceiverConnected
-    EventReceiver.OnListenResponse += EventReceiverListenResponse
-    EventReceiver.OnRewardRedeemed += EventReceiverRewardRedeemed    
+    EventReceiver.OnRewardRedeemed += EventReceiverRewardRedeemed
 
     EventReceiver.Connect()
 
 def EventReceiverConnected(sender, e):
 
+    if ScriptSettings.EnableDebug:
+        Parent.Log(ScriptName, "Event receiver connecting")
+
     #get channel id for username
-    headers = {  "Authorization": "Bearer " + ScriptSettings.TwitchOAuthToken[6:] }
-    result = json.loads(Parent.GetRequest("https://api.twitch.tv/helix/users?login=" + ScriptSettings.Username,headers))
+    headers = { 
+        "Client-ID": "icyqwwpy744ugu5x4ymyt6jqrnpxso",
+        "Authorization": "Bearer " + ScriptSettings.TwitchOAuthToken[6:] 
+    }
+    result = json.loads(Parent.GetRequest("https://api.twitch.tv/helix/users?login=" + Parent.GetChannelName(), headers))
+    if ScriptSettings.EnableDebug:
+        Parent.Log(ScriptName, "result: " + str(result))
     user = json.loads(result["response"])
     id = user["data"][0]["id"]
 
@@ -113,14 +119,6 @@ def EventReceiverConnected(sender, e):
 
     EventReceiver.ListenToRewards(id)
     EventReceiver.SendTopics(ScriptSettings.TwitchOAuthToken)
-    return
-
-def EventReceiverListenResponse(sender, e):
-    if ScriptSettings.EnableDebug:
-        if e.Successful:
-            Parent.Log(ScriptName, "Successfully verified listening to topic: " + e.Topic)
-        else:
-            Parent.Log(ScriptName, "Failed to listen! Error: " + e.Response.Error)
     return
 
 def EventReceiverRewardRedeemed(sender, e):

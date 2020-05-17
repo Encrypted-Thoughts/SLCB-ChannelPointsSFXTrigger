@@ -1,27 +1,5 @@
 {
 	"output_file": "settings.json",
-	"Username": {
-		"type": "textbox",
-		"value": "",
-		"label": "Twitch Username of Channel to Watch",
-		"tooltip": "This specifies the Twitch channel that the script should watch for channel point reward redemptions on.",
-		"group": ""
-	},
-	"TwitchOAuthToken": {
-		"type": "textbox",
-		"value": "",
-		"label": "Twitch oAuth Token",
-		"tooltip": "Enter an oAuth token that allows the bot to read channel point redemptions on the channel being watched.",
-		"group": "Twitch oAuth - KEEP HIDDEN"
-	},
-	"btnGetToken": {
-		"type": "button",
-		"label": "Get Token",
-		"tooltip": "Generate an oAuth Token for the watched twitch account with permissions to read channel point redemptions.",
-		"wsevent": "",
-		"function": "GetToken",
-		"group": "Twitch oAuth - KEEP HIDDEN"
-	},
 	"TwitchReward1Name": {
 		"type": "textbox",
 		"value": "",
@@ -176,6 +154,21 @@
 		"value": 10,
 		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
 		"group": "Twitch Reward 5 Event"
+	},
+	"TwitchOAuthToken": {
+		"type": "textbox",
+		"value": "",
+		"label": "Twitch oAuth Token",
+		"tooltip": "Enter an oAuth token that allows the bot to read channel point redemptions on the channel being watched.",
+		"group": "Twitch oAuth - KEEP HIDDEN"
+	},
+	"btnGetToken": {
+		"type": "button",
+		"label": "Get Token",
+		"tooltip": "Generate an oAuth Token for the watched twitch account with permissions to read channel point redemptions.",
+		"wsevent": "",
+		"function": "GetToken",
+		"group": "Twitch oAuth - KEEP HIDDEN"
 	},
 	"btnreadme": {
 		"type": "button",
