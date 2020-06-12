@@ -81,10 +81,6 @@ def Init():
     global ScriptSettings
     ScriptSettings = Settings(SettingsFile)
     ScriptSettings.Save(SettingsFile)
-
-    ## Init the Streamlabs Event Receiver
-    Start()
-
     return
 
 def Start():
@@ -97,6 +93,19 @@ def Start():
     EventReceiver.OnRewardRedeemed += EventReceiverRewardRedeemed
 
     EventReceiver.Connect()
+
+def Stop():
+    global EventReceiver
+    try:
+        if EventReceiver:
+            EventReceiver.Disconnect()
+            if ScriptSettings.EnableDebug:
+                Parent.Log(ScriptName, "Event receiver disconnected")
+        EventReceiver = None
+
+    except:
+        if ScriptSettings.EnableDebug:
+            Parent.Log(ScriptName, "Event receiver already disconnected")
 
 def EventReceiverConnected(sender, e):
 
@@ -156,6 +165,11 @@ def Execute(data):
 #---------------------------
 def Tick():
 
+    ## Init the Channel Points Event Receiver
+    global EventReceiver
+    if EventReceiver is None:
+        Start()
+
     global PlayNextAt
     if PlayNextAt > datetime.datetime.now():
         return
@@ -186,15 +200,11 @@ def ReloadSettings(jsonData):
     if ScriptSettings.EnableDebug:
         Parent.Log(ScriptName, "Saving settings.")
 
-    global EventReceiver
     try:
-        if EventReceiver:
-            EventReceiver.Disconnect()
-
         ScriptSettings.__dict__ = json.loads(jsonData)
         ScriptSettings.Save(SettingsFile)
-        EventReceiver = None
 
+        Stop()
         Start()
         if ScriptSettings.EnableDebug:
             Parent.Log(ScriptName, "Settings saved successfully")
@@ -209,19 +219,19 @@ def ReloadSettings(jsonData):
 #---------------------------
 def Unload():
     # Disconnect EventReceiver cleanly
-    try:
-        if EventReceiver:
-            EventReceiver.Disconnect()
-    except:
-        if ScriptSettings.EnableDebug:
-            Parent.Log(ScriptName, "Event receiver already disconnected")
-
+    Stop()
     return
 
 #---------------------------
 #   [Optional] ScriptToggled (Notifies you when a user disables your script or enables it)
 #---------------------------
 def ScriptToggled(state):
+    if state:
+        if EventReceiver is None:
+            Start()
+    else:
+        Stop()
+
     return
 
 def OpenReadme():
