@@ -142,12 +142,11 @@ def Tick():
 #---------------------------
 def Parse(parseString, userid, username, targetid, targetname, message):
     return parseString
+
 #---------------------------
 #   [Optional] Reload Settings (Called when a user clicks the Save Settings button in the Chatbot UI)
 #---------------------------
 def ReloadSettings(jsonData):
-    # Execute json reloading here
-
     if ScriptSettings.EnableDebug:
         Parent.Log(ScriptName, "Saving settings.")
 
@@ -169,9 +168,7 @@ def ReloadSettings(jsonData):
 #   [Optional] Unload (Called when a user reloads their scripts or closes the bot / cleanup stuff)
 #---------------------------
 def Unload():
-    # Disconnect EventReceiver cleanly
     StopEventReceiver()
-    
     return
 
 #---------------------------
@@ -303,7 +300,6 @@ def RefreshTokens():
 #   GetUserID (Calls twitch's api with current channel user name to get the user id and sets global UserID variable.)
 #---------------------------
 def GetUserID():
-    #get channel id for username
     headers = { 
         "Client-ID": "icyqwwpy744ugu5x4ymyt6jqrnpxso",
         "Authorization": "Bearer " + AccessToken
@@ -329,12 +325,21 @@ def SaveTokens():
     with open(RefreshTokenFile, 'w') as f:
         f.write(json.dumps(data))
 
+#---------------------------
+#   OpenReadme (Attached to settings button to open the readme file in the script bin.)
+#---------------------------
 def OpenReadme():
     os.startfile(ReadMe)
 
+#---------------------------
+#   GetToken (Attached to settings button to open a page in browser to get an authorization code.)
+#---------------------------
 def GetToken():
 	os.startfile("https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=icyqwwpy744ugu5x4ymyt6jqrnpxso&redirect_uri=https://et-twitch-auth.com/&scope=channel:read:redemptions&force_verify=true")
 
+#---------------------------
+#   DeleteSavedTokens (Attached to settings button to allow user to easily delete the tokens.json file and clear out RefreshToken currently in memory so that a new authorization code can be entered and used.)
+#---------------------------
 def DeleteSavedTokens():
     global RefreshToken
     if os.path.exists(RefreshTokenFile):
