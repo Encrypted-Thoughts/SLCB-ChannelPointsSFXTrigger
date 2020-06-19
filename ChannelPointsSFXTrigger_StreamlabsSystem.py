@@ -6,7 +6,8 @@
 import clr, codecs, json, os, re, sys, threading, datetime
 
 clr.AddReference("IronPython.Modules.dll")
-clr.AddReferenceToFileAndPath(os.path.join(os.path.dirname(os.path.realpath(__file__)) + "\References", "TwitchLib.PubSub.dll"))
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)) + "\References"))
+clr.AddReferenceToFile("TwitchLib.PubSub.dll")
 from TwitchLib.PubSub import TwitchPubSub
 
 #---------------------------
@@ -16,17 +17,22 @@ ScriptName = "Twitch Channel Points SFX Trigger"
 Website = "https://www.twitch.tv/EncryptedThoughts"
 Description = "Script to trigger SFX on channel point reward redemptions."
 Creator = "EncryptedThoughts"
-Version = "1.0.0.0"
+Version = "2.0.0.0"
 
 #---------------------------
 #   Define Global Variables
 #---------------------------
 SettingsFile = os.path.join(os.path.dirname(__file__), "settings.json")
+RefreshTokenFile = os.path.join(os.path.dirname(__file__), "tokens.json")
 ReadMe = os.path.join(os.path.dirname(__file__), "README.txt")
 EventReceiver = None
 ThreadQueue = []
 CurrentThread = None
 PlayNextAt = datetime.datetime.now()
+TokenExpiration = None
+LastTokenCheck = None # Used to make sure the bot doesn't spam trying to reconnect if there's a problem
+RefreshToken = None
+AccessToken = None
 
 #---------------------------------------
 # Classes
@@ -38,7 +44,7 @@ class Settings(object):
                 self.__dict__ = json.load(f, encoding="utf-8")
         else:
             self.EnableDebug = False
-            self.TwitchOAuthToken = ""
+            self.TwitchAuthCode = ""
             self.TwitchReward1Name = ""
             self.SFX1Path = ""
             self.SFX1Volume = 100
@@ -81,9 +87,25 @@ def Init():
     global ScriptSettings
     ScriptSettings = Settings(SettingsFile)
     ScriptSettings.Save(SettingsFile)
+
+    global RefreshToken
+    global AccessToken
+    global TokenExpiration
+    global LastTokenCheck
+    if os.path.isfile(RefreshTokenFile):
+        with open(RefreshTokenFile) as f:
+            content = f.readlines()
+        if len(content) > 0:
+            data = json.loads(content[0])
+            RefreshToken = data["refresh_token"]
+            AccessToken = data["access_token"]
+            TokenExpiration = datetime.datetime.strptime(data["expiration"], "%Y-%m-%d %H:%M:%S.%f")
+    
+    RefreshTokens()
+
     return
 
-def Start():
+def StartEventReceiver():
     if ScriptSettings.EnableDebug:
         Parent.Log(ScriptName, "Starting receiver");
 
@@ -94,7 +116,7 @@ def Start():
 
     EventReceiver.Connect()
 
-def Stop():
+def StopEventReceiver():
     global EventReceiver
     try:
         if EventReceiver:
@@ -115,7 +137,7 @@ def EventReceiverConnected(sender, e):
     #get channel id for username
     headers = { 
         "Client-ID": "icyqwwpy744ugu5x4ymyt6jqrnpxso",
-        "Authorization": "Bearer " + ScriptSettings.TwitchOAuthToken[6:] 
+        "Authorization": "Bearer " + AccessToken
     }
     result = json.loads(Parent.GetRequest("https://api.twitch.tv/helix/users?login=" + Parent.GetChannelName(), headers))
     if ScriptSettings.EnableDebug:
@@ -127,7 +149,7 @@ def EventReceiverConnected(sender, e):
         Parent.Log(ScriptName, "Event receiver connected, sending topics for channel id: " + id)
 
     EventReceiver.ListenToRewards(id)
-    EventReceiver.SendTopics(ScriptSettings.TwitchOAuthToken)
+    EventReceiver.SendTopics(AccessToken)
     return
 
 def EventReceiverRewardRedeemed(sender, e):
@@ -168,7 +190,15 @@ def Tick():
     ## Init the Channel Points Event Receiver
     global EventReceiver
     if EventReceiver is None:
-        Start()
+        StartEventReceiver()
+
+    global TokenExpiration
+    global LastTokenCheck
+    if TokenExpiration < datetime.datetime.now() and LastTokenCheck + datetime.timedelta(seconds=60) < datetime.datetime.now(): 
+        RefreshTokens()
+        StopEventReceiver()
+        StartEventReceiver()
+        return
 
     global PlayNextAt
     if PlayNextAt > datetime.datetime.now():
@@ -204,8 +234,8 @@ def ReloadSettings(jsonData):
         ScriptSettings.__dict__ = json.loads(jsonData)
         ScriptSettings.Save(SettingsFile)
 
-        Stop()
-        Start()
+        StopEventReceiver()
+        StartEventReceiver()
         if ScriptSettings.EnableDebug:
             Parent.Log(ScriptName, "Settings saved successfully")
     except Exception as e:
@@ -219,7 +249,8 @@ def ReloadSettings(jsonData):
 #---------------------------
 def Unload():
     # Disconnect EventReceiver cleanly
-    Stop()
+    StopEventReceiver()
+    
     return
 
 #---------------------------
@@ -228,14 +259,67 @@ def Unload():
 def ScriptToggled(state):
     if state:
         if EventReceiver is None:
-            Start()
+            StartEventReceiver()
     else:
-        Stop()
+        StopEventReceiver()
 
     return
+
+def RefreshTokens():
+    global RefreshToken
+    global AccessToken
+    global TokenExpiration
+    global LastTokenCheck
+
+    result = None
+
+    if RefreshToken:
+        content = {
+	        "grant_type": "refresh_token",
+	        "refresh_token": str(RefreshToken)
+        }
+
+        result = json.loads(json.loads(Parent.PostRequest("https://api.et-twitch-auth.com/",{}, content, True))["response"])
+        if ScriptSettings.EnableDebug:
+            Parent.Log(ScriptName, str(content))
+    else:
+        content = {
+            'grant_type': 'authorization_code',
+            'code': ScriptSettings.TwitchAuthCode
+        }
+
+        result = json.loads(json.loads(Parent.PostRequest("https://api.et-twitch-auth.com/",{}, content, True))["response"])
+        if ScriptSettings.EnableDebug:
+            Parent.Log(ScriptName, str(content))
+
+    if ScriptSettings.EnableDebug:
+        Parent.Log(ScriptName, str(result))
+
+    RefreshToken = result["refresh_token"]
+    AccessToken = result["access_token"]
+    TokenExpiration = datetime.datetime.now() + datetime.timedelta(seconds=int(result["expires_in"]) - 300)
+
+    LastTokenCheck = datetime.datetime.now()
+    SaveTokens()
+
+def SaveTokens():
+    data = {
+        "refresh_token": RefreshToken,
+        "access_token": AccessToken,
+        "expiration": str(TokenExpiration)
+    }
+
+    with open(RefreshTokenFile, 'w') as f:
+        f.write(json.dumps(data))
 
 def OpenReadme():
     os.startfile(ReadMe)
 
 def GetToken():
-	os.startfile("https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=icyqwwpy744ugu5x4ymyt6jqrnpxso&redirect_uri=https://twitchapps.com/tmi/&scope=channel:read:redemptions&force_verify=true")
+	os.startfile("https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=icyqwwpy744ugu5x4ymyt6jqrnpxso&redirect_uri=https://et-twitch-auth.com/&scope=channel:read:redemptions&force_verify=true")
+
+def DeleteSavedTokens():
+    global RefreshToken
+    if os.path.exists(RefreshTokenFile):
+        os.remove(RefreshTokenFile)
+    RefreshToken = None
