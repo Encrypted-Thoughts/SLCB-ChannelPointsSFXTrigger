@@ -33,6 +33,7 @@ TokenExpiration = None
 LastTokenCheck = None # Used to make sure the bot doesn't spam trying to reconnect if there's a problem
 RefreshToken = None
 AccessToken = None
+UserID = None
 
 #---------------------------------------
 # Classes
@@ -91,7 +92,6 @@ def Init():
     global RefreshToken
     global AccessToken
     global TokenExpiration
-    global LastTokenCheck
     if os.path.isfile(RefreshTokenFile):
         with open(RefreshTokenFile) as f:
             content = f.readlines()
@@ -100,8 +100,6 @@ def Init():
             RefreshToken = data["refresh_token"]
             AccessToken = data["access_token"]
             TokenExpiration = datetime.datetime.strptime(data["expiration"], "%Y-%m-%d %H:%M:%S.%f")
-    
-    RefreshTokens()
 
     return
 
@@ -130,25 +128,10 @@ def StopEventReceiver():
             Parent.Log(ScriptName, "Event receiver already disconnected")
 
 def EventReceiverConnected(sender, e):
-
     if ScriptSettings.EnableDebug:
-        Parent.Log(ScriptName, "Event receiver connecting")
+        Parent.Log(ScriptName, "Event receiver connected, sending topics for channel id: " + str(UserID))
 
-    #get channel id for username
-    headers = { 
-        "Client-ID": "icyqwwpy744ugu5x4ymyt6jqrnpxso",
-        "Authorization": "Bearer " + AccessToken
-    }
-    result = json.loads(Parent.GetRequest("https://api.twitch.tv/helix/users?login=" + Parent.GetChannelName(), headers))
-    if ScriptSettings.EnableDebug:
-        Parent.Log(ScriptName, "result: " + str(result))
-    user = json.loads(result["response"])
-    id = user["data"][0]["id"]
-
-    if ScriptSettings.EnableDebug:
-        Parent.Log(ScriptName, "Event receiver connected, sending topics for channel id: " + id)
-
-    EventReceiver.ListenToRewards(id)
+    EventReceiver.ListenToRewards(UserID)
     EventReceiver.SendTopics(AccessToken)
     return
 
@@ -175,7 +158,6 @@ def RewardRedeemedWorker(path, volume, delay):
     global PlayNextAt
     PlayNextAt = datetime.datetime.now() + datetime.timedelta(0, delay)
 
-
 #---------------------------
 #   [Required] Execute Data / Process messages
 #---------------------------
@@ -186,16 +168,10 @@ def Execute(data):
 #   [Required] Tick method (Gets called during every iteration even when there is no incoming data)
 #---------------------------
 def Tick():
-
-    ## Init the Channel Points Event Receiver
-    global EventReceiver
-    if EventReceiver is None:
-        StartEventReceiver()
-
-    global TokenExpiration
-    global LastTokenCheck
-    if TokenExpiration < datetime.datetime.now() and LastTokenCheck + datetime.timedelta(seconds=60) < datetime.datetime.now(): 
+    if (TokenExpiration < datetime.datetime.now() and LastTokenCheck + datetime.timedelta(seconds=60) < datetime.datetime.now()) or EventReceiver is None: 
         RefreshTokens()
+        if UserID is None:
+            GetUserID()
         StopEventReceiver()
         StartEventReceiver()
         return
@@ -259,6 +235,9 @@ def Unload():
 def ScriptToggled(state):
     if state:
         if EventReceiver is None:
+            RefreshTokens()
+            if UserID is None:
+                GetUserID()
             StartEventReceiver()
     else:
         StopEventReceiver()
@@ -301,6 +280,20 @@ def RefreshTokens():
 
     LastTokenCheck = datetime.datetime.now()
     SaveTokens()
+
+def GetUserID():
+    #get channel id for username
+    headers = { 
+        "Client-ID": "icyqwwpy744ugu5x4ymyt6jqrnpxso",
+        "Authorization": "Bearer " + AccessToken
+    }
+    result = json.loads(Parent.GetRequest("https://api.twitch.tv/helix/users?login=" + Parent.GetChannelName(), headers))
+    if ScriptSettings.EnableDebug:
+        Parent.Log(ScriptName, "headers: " + str(headers))
+        Parent.Log(ScriptName, "result: " + str(result))
+    user = json.loads(result["response"])
+    global UserID
+    UserID = user["data"][0]["id"]
 
 def SaveTokens():
     data = {
