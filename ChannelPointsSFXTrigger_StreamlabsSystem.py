@@ -191,7 +191,7 @@ def ScriptToggled(state):
 #---------------------------
 def StartEventReceiver():
     if ScriptSettings.EnableDebug:
-        Parent.Log(ScriptName, "Starting receiver");
+        Parent.Log(ScriptName, "Starting receiver")
 
     global EventReceiver
     EventReceiver = TwitchPubSub()
