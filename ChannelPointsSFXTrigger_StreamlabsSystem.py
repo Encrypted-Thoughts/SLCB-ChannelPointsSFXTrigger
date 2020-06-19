@@ -35,6 +35,8 @@ RefreshToken = None
 AccessToken = None
 UserID = None
 
+InvalidRefreshToken = False
+
 #---------------------------------------
 # Classes
 #---------------------------------------
@@ -113,12 +115,13 @@ def Execute(data):
 #   [Required] Tick method (Gets called during every iteration even when there is no incoming data)
 #---------------------------
 def Tick():
-    if (TokenExpiration < datetime.datetime.now() and LastTokenCheck + datetime.timedelta(seconds=60) < datetime.datetime.now()) or EventReceiver is None: 
-        RefreshTokens()
-        if UserID is None:
-            GetUserID()
-        StopEventReceiver()
-        StartEventReceiver()
+    if (EventReceiver is None or TokenExpiration < datetime.datetime.now()) and LastTokenCheck + datetime.timedelta(seconds=60) < datetime.datetime.now(): 
+        RefreshTokens();
+        if InvalidRefreshToken is False:
+            if UserID is None:
+                GetUserID()
+            StopEventReceiver()
+            StartEventReceiver()
         return
 
     global PlayNextAt
@@ -154,8 +157,13 @@ def ReloadSettings(jsonData):
         ScriptSettings.__dict__ = json.loads(jsonData)
         ScriptSettings.Save(SettingsFile)
 
-        StopEventReceiver()
-        StartEventReceiver()
+        RefreshTokens()
+        if InvalidRefreshToken is False:
+            if UserID is None:
+                GetUserID()
+            StopEventReceiver()
+            StartEventReceiver()
+
         if ScriptSettings.EnableDebug:
             Parent.Log(ScriptName, "Settings saved successfully")
     except Exception as e:
@@ -178,9 +186,10 @@ def ScriptToggled(state):
     if state:
         if EventReceiver is None:
             RefreshTokens()
-            if UserID is None:
-                GetUserID()
-            StartEventReceiver()
+            if InvalidRefreshToken is False:
+                if UserID is None:
+                    GetUserID()
+                StartEventReceiver()
     else:
         StopEventReceiver()
 
@@ -264,37 +273,55 @@ def RefreshTokens():
     global AccessToken
     global TokenExpiration
     global LastTokenCheck
+    global InvalidRefreshToken
+    global InvalidAuthCode
+
+    InvalidRefreshToken = False
 
     result = None
 
-    if RefreshToken:
-        content = {
-	        "grant_type": "refresh_token",
-	        "refresh_token": str(RefreshToken)
-        }
+    try:
+        if RefreshToken:
+            content = {
+	            "grant_type": "refresh_token",
+	            "refresh_token": str(RefreshToken)
+            }
 
-        result = json.loads(json.loads(Parent.PostRequest("https://api.et-twitch-auth.com/",{}, content, True))["response"])
+            result = json.loads(json.loads(Parent.PostRequest("https://api.et-twitch-auth.com/",{}, content, True))["response"])
+            if ScriptSettings.EnableDebug:
+                Parent.Log(ScriptName, str(content))
+        else:
+            if ScriptSettings.TwitchAuthCode == "":
+                LastTokenCheck = datetime.datetime.now()
+                TokenExpiration = datetime.datetime.now()
+                Parent.Log(ScriptName, "Access code cannot be retrieved please enter a valid authorization code.")
+                InvalidRefreshToken = True
+                return
+
+            content = {
+                'grant_type': 'authorization_code',
+                'code': ScriptSettings.TwitchAuthCode
+            }
+
+            result = json.loads(json.loads(Parent.PostRequest("https://api.et-twitch-auth.com/",{}, content, True))["response"])
+            if ScriptSettings.EnableDebug:
+                Parent.Log(ScriptName, str(content))
+
         if ScriptSettings.EnableDebug:
-            Parent.Log(ScriptName, str(content))
-    else:
-        content = {
-            'grant_type': 'authorization_code',
-            'code': ScriptSettings.TwitchAuthCode
-        }
+            Parent.Log(ScriptName, str(result))
 
-        result = json.loads(json.loads(Parent.PostRequest("https://api.et-twitch-auth.com/",{}, content, True))["response"])
+        RefreshToken = result["refresh_token"]
+        AccessToken = result["access_token"]
+        TokenExpiration = datetime.datetime.now() + datetime.timedelta(seconds=int(result["expires_in"]) - 300)
+
+        LastTokenCheck = datetime.datetime.now()
+        SaveTokens()
+    except Exception as e:
+        LastTokenCheck = datetime.datetime.now()
+        TokenExpiration = datetime.datetime.now()
         if ScriptSettings.EnableDebug:
-            Parent.Log(ScriptName, str(content))
-
-    if ScriptSettings.EnableDebug:
-        Parent.Log(ScriptName, str(result))
-
-    RefreshToken = result["refresh_token"]
-    AccessToken = result["access_token"]
-    TokenExpiration = datetime.datetime.now() + datetime.timedelta(seconds=int(result["expires_in"]) - 300)
-
-    LastTokenCheck = datetime.datetime.now()
-    SaveTokens()
+            Parent.Log(ScriptName, "Exception: " + str(e.message))
+        InvalidRefreshToken = True
 
 #---------------------------
 #   GetUserID (Calls twitch's api with current channel user name to get the user id and sets global UserID variable.)
