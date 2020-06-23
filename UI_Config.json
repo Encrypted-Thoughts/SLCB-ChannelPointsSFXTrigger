@@ -7,6 +7,17 @@
 		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
 		"group": "Twitch Reward 1 Event"
 	},
+	"TwitchReward1ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 1 Event"
+	},
 	"SFX1Path": {
 		"type": "textbox",
 		"value": "",
@@ -36,6 +47,17 @@
 		"value": "",
 		"label": "Title of Twitch Reward",
 		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 2 Event"
+	},
+	"TwitchReward2ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
 		"group": "Twitch Reward 2 Event"
 	},
 	"SFX2Path": {
@@ -69,6 +91,17 @@
 		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
 		"group": "Twitch Reward 3 Event"
 	},
+	"TwitchReward3ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 3 Event"
+	},
 	"SFX3Path": {
 		"type": "textbox",
 		"value": "",
@@ -100,6 +133,17 @@
 		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
 		"group": "Twitch Reward 4 Event"
 	},
+	"TwitchReward4ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 4 Event"
+	},
 	"SFX4Path": {
 		"type": "textbox",
 		"value": "",
@@ -129,6 +173,17 @@
 		"value": "",
 		"label": "Title of Twitch Reward",
 		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 5 Event"
+	},
+	"TwitchReward5ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
 		"group": "Twitch Reward 5 Event"
 	},
 	"SFX5Path": {
