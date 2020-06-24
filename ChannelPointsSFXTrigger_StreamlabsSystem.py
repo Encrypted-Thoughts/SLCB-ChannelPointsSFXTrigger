@@ -273,7 +273,7 @@ def RewardRedeemedWorker(path, volume, delay):
     if ScriptSettings.EnableDebug:
         Parent.Log(ScriptName, path + " " + str(volume) + " " + str(delay))
 
-    Parent.PlaySound(path, volume/100)
+    Parent.PlaySound(path, volume/100.0)
     global PlayNextAt
     PlayNextAt = datetime.datetime.now() + datetime.timedelta(0, delay)
 
