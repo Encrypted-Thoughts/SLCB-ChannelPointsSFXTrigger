@@ -10,10 +10,6 @@ https://github.com/StreamlabsSupport/Streamlabs-Chatbot/wiki/Prepare-&-Import-Sc
 
 Click [Here](https://github.com/Encrypted-Thoughts/SLCB-ChannelPointsSFXTrigger/blob/master/ChannelPointsSFXTrigger.zip?raw=true) to download the script pack.
 
-Once installed you will need to provide an oAuth token. You can get one by clicking the Get Token button in script settings.
-
-![token](https://user-images.githubusercontent.com/50642352/82402817-f8165480-9a22-11ea-8810-fc93899d785a.png)
-
 ## Use
 
 Once installed you just need to add custom channel point rewards to your twitch channel and then match the names of the reward to a Twitch Reward event in the script settings.
