@@ -210,37 +210,6 @@
 		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
 		"group": "Twitch Reward 5 Event"
 	},
-	"TwitchAuthCode": {
-		"type": "textbox",
-		"value": "",
-		"label": "Twitch Auth Code",
-		"tooltip": "Enter an Auth Code that allows the bot to read channel point redemptions on the channel being watched.",
-		"group": "Twitch Auth Code - KEEP HIDDEN"
-	},
-	"btnGetToken": {
-		"type": "button",
-		"label": "Get Token",
-		"tooltip": "Generate an Auth Code for the watched twitch account with permissions to read channel point redemptions.",
-		"wsevent": "",
-		"function": "GetToken",
-		"group": "Twitch Auth Code - KEEP HIDDEN"
-	},
-	"btnDeleteSavedTokens": {
-		"type": "button",
-		"label": "Delete Saved Tokens",
-		"tooltip": "Clear out saved tokens so that a new Authorization Code can be used.",
-		"wsevent": "",
-		"function": "DeleteSavedTokens",
-		"group": "Twitch Auth Code - KEEP HIDDEN"
-	},
-	"btnRefreshTokens": {
-		"type": "button",
-		"label": "Refresh Saved Tokens",
-		"tooltip": "Manually trigger a refresh of access token using refresh token..",
-		"wsevent": "",
-		"function": "RefreshTokens",
-		"group": "Twitch Auth Code - KEEP HIDDEN"
-	},
 	"btnreadme": {
 		"type": "button",
 		"label": "open readme",

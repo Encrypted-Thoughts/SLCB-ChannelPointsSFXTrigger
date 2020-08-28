@@ -3,7 +3,11 @@
 #---------------------------
 #   Import Libraries
 #---------------------------
-import clr, codecs, json, os, re, sys, threading, datetime
+import clr, codecs, json, os, re, sys, threading, datetime, System
+
+# Include the assembly with the name AnkhBotR2
+clr.AddReference([asbly for asbly in System.AppDomain.CurrentDomain.GetAssemblies() if "AnkhBotR2" in str(asbly)][0])
+import AnkhBotR2
 
 clr.AddReference("IronPython.Modules.dll")
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + r"\References")
@@ -23,19 +27,11 @@ Version = "2.0.0.0"
 #   Define Global Variables
 #---------------------------
 SettingsFile = os.path.join(os.path.dirname(__file__), "settings.json")
-RefreshTokenFile = os.path.join(os.path.dirname(__file__), "tokens.json")
 ReadMe = os.path.join(os.path.dirname(__file__), "README.txt")
 EventReceiver = None
 ThreadQueue = []
 CurrentThread = None
 PlayNextAt = datetime.datetime.now()
-TokenExpiration = None
-LastTokenCheck = None # Used to make sure the bot doesn't spam trying to reconnect if there's a problem
-RefreshToken = None
-AccessToken = None
-UserID = None
-
-InvalidRefreshToken = False
 
 #---------------------------------------
 # Classes
@@ -47,7 +43,6 @@ class Settings(object):
                 self.__dict__ = json.load(f, encoding="utf-8")
         else:
             self.EnableDebug = False
-            self.TwitchAuthCode = ""
             self.TwitchReward1Name = ""
             self.TwitchReward1ActivationType = "Immediate"
             self.SFX1Path = ""
@@ -96,18 +91,6 @@ def Init():
     ScriptSettings = Settings(SettingsFile)
     ScriptSettings.Save(SettingsFile)
 
-    global RefreshToken
-    global AccessToken
-    global TokenExpiration
-    if os.path.isfile(RefreshTokenFile):
-        with open(RefreshTokenFile) as f:
-            content = f.readlines()
-        if len(content) > 0:
-            data = json.loads(content[0])
-            RefreshToken = data["refresh_token"]
-            AccessToken = data["access_token"]
-            TokenExpiration = datetime.datetime.strptime(data["expiration"], "%Y-%m-%d %H:%M:%S.%f")
-
     return
 
 #---------------------------
@@ -120,10 +103,7 @@ def Execute(data):
 #   [Required] Tick method (Gets called during every iteration even when there is no incoming data)
 #---------------------------
 def Tick():
-    if LastTokenCheck is None:
-        return
-
-    if (EventReceiver is None or TokenExpiration < datetime.datetime.now()) and LastTokenCheck + datetime.timedelta(seconds=60) < datetime.datetime.now(): 
+    if EventReceiver is None: 
         RestartEventReceiver()
         return
 
@@ -223,22 +203,25 @@ def StopEventReceiver():
 #   RestartEventReceiver (Restart event receiver cleanly)
 #---------------------------
 def RestartEventReceiver():
-    RefreshTokens()
-    if InvalidRefreshToken is False:
-        if UserID is None:
-            GetUserID()
-        StopEventReceiver()
-        StartEventReceiver()
+    StopEventReceiver()
+    StartEventReceiver()
 
 #---------------------------
 #   EventReceiverConnected (Twitch pubsub event callback for on connected event. Needs a valid UserID and AccessToken to function properly.)
 #---------------------------
 def EventReceiverConnected(sender, e):
-    if ScriptSettings.EnableDebug:
-        Parent.Log(ScriptName, "Event receiver connected, sending topics for channel id: " + str(UserID))
+    oauth = AnkhBotR2.Managers.GlobalManager.Instance.VMLocator.StreamerLogin.Token.replace("oauth:", "")
 
-    EventReceiver.ListenToRewards(UserID)
-    EventReceiver.SendTopics(AccessToken)
+    headers = { "Authorization": 'OAuth ' + oauth }
+    data = json.loads(Parent.GetRequest("https://id.twitch.tv/oauth2/validate", headers))
+
+    userid = json.loads(data["response"])['user_id']
+
+    if ScriptSettings.EnableDebug:
+        Parent.Log(ScriptName, "Event receiver connected, sending topics for channel id: " + str(userid))
+
+    EventReceiver.ListenToRewards(userid)
+    EventReceiver.SendTopics(oauth)
     return
 
 #---------------------------
@@ -278,109 +261,7 @@ def RewardRedeemedWorker(path, volume, delay):
     PlayNextAt = datetime.datetime.now() + datetime.timedelta(0, delay)
 
 #---------------------------
-#   RefreshTokens (Called when a new access token needs to be retrieved.)
-#---------------------------
-def RefreshTokens():
-    global RefreshToken
-    global AccessToken
-    global TokenExpiration
-    global LastTokenCheck
-    global InvalidRefreshToken
-    global InvalidAuthCode
-
-    InvalidRefreshToken = False
-
-    result = None
-
-    try:
-        if RefreshToken:
-            content = {
-	            "grant_type": "refresh_token",
-	            "refresh_token": str(RefreshToken)
-            }
-
-            result = json.loads(json.loads(Parent.PostRequest("https://api.et-twitch-auth.com/",{}, content, True))["response"])
-            if ScriptSettings.EnableDebug:
-                Parent.Log(ScriptName, str(content))
-        else:
-            if ScriptSettings.TwitchAuthCode == "":
-                LastTokenCheck = datetime.datetime.now()
-                TokenExpiration = datetime.datetime.now()
-                Parent.Log(ScriptName, "Access code cannot be retrieved please enter a valid authorization code.")
-                InvalidRefreshToken = True
-                return
-
-            content = {
-                'grant_type': 'authorization_code',
-                'code': ScriptSettings.TwitchAuthCode
-            }
-
-            result = json.loads(json.loads(Parent.PostRequest("https://api.et-twitch-auth.com/",{}, content, True))["response"])
-            if ScriptSettings.EnableDebug:
-                Parent.Log(ScriptName, str(content))
-
-        if ScriptSettings.EnableDebug:
-            Parent.Log(ScriptName, str(result))
-
-        RefreshToken = result["refresh_token"]
-        AccessToken = result["access_token"]
-        TokenExpiration = datetime.datetime.now() + datetime.timedelta(seconds=int(result["expires_in"]) - 300)
-
-        LastTokenCheck = datetime.datetime.now()
-        SaveTokens()
-    except Exception as e:
-        LastTokenCheck = datetime.datetime.now()
-        TokenExpiration = datetime.datetime.now()
-        if ScriptSettings.EnableDebug:
-            Parent.Log(ScriptName, "Exception: " + str(e.message))
-        InvalidRefreshToken = True
-
-#---------------------------
-#   GetUserID (Calls twitch's api with current channel user name to get the user id and sets global UserID variable.)
-#---------------------------
-def GetUserID():
-    headers = { 
-        "Client-ID": "icyqwwpy744ugu5x4ymyt6jqrnpxso",
-        "Authorization": "Bearer " + AccessToken
-    }
-    result = json.loads(Parent.GetRequest("https://api.twitch.tv/helix/users?login=" + Parent.GetChannelName(), headers))
-    if ScriptSettings.EnableDebug:
-        Parent.Log(ScriptName, "headers: " + str(headers))
-        Parent.Log(ScriptName, "result: " + str(result))
-    user = json.loads(result["response"])
-    global UserID
-    UserID = user["data"][0]["id"]
-
-#---------------------------
-#   SaveTokens (Saves tokens and expiration time to a json file in script bin for use on script restart and reload.)
-#---------------------------
-def SaveTokens():
-    data = {
-        "refresh_token": RefreshToken,
-        "access_token": AccessToken,
-        "expiration": str(TokenExpiration)
-    }
-
-    with open(RefreshTokenFile, 'w') as f:
-        f.write(json.dumps(data))
-
-#---------------------------
 #   OpenReadme (Attached to settings button to open the readme file in the script bin.)
 #---------------------------
 def OpenReadme():
     os.startfile(ReadMe)
-
-#---------------------------
-#   GetToken (Attached to settings button to open a page in browser to get an authorization code.)
-#---------------------------
-def GetToken():
-	os.startfile("https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=icyqwwpy744ugu5x4ymyt6jqrnpxso&redirect_uri=https://et-twitch-auth.com/&scope=channel:read:redemptions&force_verify=true")
-
-#---------------------------
-#   DeleteSavedTokens (Attached to settings button to allow user to easily delete the tokens.json file and clear out RefreshToken currently in memory so that a new authorization code can be entered and used.)
-#---------------------------
-def DeleteSavedTokens():
-    global RefreshToken
-    if os.path.exists(RefreshTokenFile):
-        os.remove(RefreshTokenFile)
-    RefreshToken = None
