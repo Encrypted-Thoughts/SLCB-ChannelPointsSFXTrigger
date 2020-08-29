@@ -103,10 +103,6 @@ def Execute(data):
 #   [Required] Tick method (Gets called during every iteration even when there is no incoming data)
 #---------------------------
 def Tick():
-    if EventReceiver is None: 
-        RestartEventReceiver()
-        return
-
     global PlayNextAt
     if PlayNextAt > datetime.datetime.now():
         return
@@ -161,7 +157,7 @@ def Unload():
 def ScriptToggled(state):
     if state:
         if EventReceiver is None:
-            threading.Thread(target=RestartEventReceiver).start()
+            RestartEventReceiver()
     else:
         StopEventReceiver()
 
@@ -190,6 +186,8 @@ def StartEventReceiver():
 def StopEventReceiver():
     global EventReceiver
     try:
+        if EventReceiver is None:
+            return
         EventReceiver.Disconnect()
         if ScriptSettings.EnableDebug:
             Parent.Log(ScriptName, "Event receiver disconnected")
