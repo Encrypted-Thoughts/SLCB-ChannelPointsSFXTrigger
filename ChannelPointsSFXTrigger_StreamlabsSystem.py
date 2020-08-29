@@ -27,7 +27,7 @@ Version = "2.0.0.0"
 #   Define Global Variables
 #---------------------------
 SettingsFile = os.path.join(os.path.dirname(__file__), "settings.json")
-ReadMe = os.path.join(os.path.dirname(__file__), "README.txt")
+ReadMe = os.path.join(os.path.dirname(__file__), "README.md")
 EventReceiver = None
 ThreadQueue = []
 CurrentThread = None
@@ -140,8 +140,6 @@ def ReloadSettings(jsonData):
         ScriptSettings.__dict__ = json.loads(jsonData)
         ScriptSettings.Save(SettingsFile)
 
-        threading.Thread(target=RestartEventReceiver).start()
-
         if ScriptSettings.EnableDebug:
             Parent.Log(ScriptName, "Settings saved successfully")
     except Exception as e:
@@ -181,7 +179,10 @@ def StartEventReceiver():
     EventReceiver.OnPubSubServiceConnected += EventReceiverConnected
     EventReceiver.OnRewardRedeemed += EventReceiverRewardRedeemed
 
-    EventReceiver.Connect()
+    try:
+        EventReceiver.Connect()
+    except Exception as e:
+        Parent.Log(ScriptName, "Unable to start event receiver. Exception: " + str(e))
 
 #---------------------------
 #   StopEventReceiver (Stop twitch pubsub event receiver)
@@ -189,15 +190,14 @@ def StartEventReceiver():
 def StopEventReceiver():
     global EventReceiver
     try:
-        if EventReceiver:
-            EventReceiver.Disconnect()
-            if ScriptSettings.EnableDebug:
-                Parent.Log(ScriptName, "Event receiver disconnected")
+        EventReceiver.Disconnect()
+        if ScriptSettings.EnableDebug:
+            Parent.Log(ScriptName, "Event receiver disconnected")
         EventReceiver = None
 
-    except:
+    except Exception as e:
         if ScriptSettings.EnableDebug:
-            Parent.Log(ScriptName, "Event receiver already disconnected")
+            Parent.Log(ScriptName, "Event receiver already disconnected. Exception: " + str(e))
 
 #---------------------------
 #   RestartEventReceiver (Restart event receiver cleanly)
@@ -231,19 +231,19 @@ def EventReceiverRewardRedeemed(sender, e):
     if ScriptSettings.EnableDebug:
         Parent.Log(ScriptName, "Event triggered: " + str(e.TimeStamp) + " ChannelId: " + str(e.ChannelId) + " Login: " + str(e.Login) + " DisplayName: " + str(e.DisplayName) + " Message: " + str(e.Message) + " RewardId: " + str(e.RewardId) + " RewardTitle: " + str(e.RewardTitle) + " RewardPrompt: " + str(e.RewardPrompt) + " RewardCost: " + str(e.RewardCost) + " Status: " + str(e.Status))
 
-    if e.RewardTitle == ScriptSettings.TwitchReward1Name:
+    if e.RewardTitle == ScriptSettings.TwitchReward1Name and not ScriptSettings.TwitchReward1Name.isspace():
         if (ScriptSettings.TwitchReward1ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward1ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
             ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX1Path, ScriptSettings.SFX1Volume, ScriptSettings.SFX1Delay,)))
-    if e.RewardTitle == ScriptSettings.TwitchReward2Name:
+    if e.RewardTitle == ScriptSettings.TwitchReward2Name and not ScriptSettings.TwitchReward2Name.isspace():
         if (ScriptSettings.TwitchReward2ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward2ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
             ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX2Path, ScriptSettings.SFX2Volume, ScriptSettings.SFX2Delay,)))
-    if e.RewardTitle == ScriptSettings.TwitchReward3Name:
+    if e.RewardTitle == ScriptSettings.TwitchReward3Name and not ScriptSettings.TwitchReward3Name.isspace():
         if (ScriptSettings.TwitchReward3ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward3ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
             ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX3Path, ScriptSettings.SFX3Volume, ScriptSettings.SFX3Delay,)))
-    if e.RewardTitle == ScriptSettings.TwitchReward4Name:
+    if e.RewardTitle == ScriptSettings.TwitchReward4Name and not ScriptSettings.TwitchReward4Name.isspace():
         if (ScriptSettings.TwitchReward4ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward4ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
             ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX4Path, ScriptSettings.SFX4Volume, ScriptSettings.SFX4Delay,)))
-    if e.RewardTitle == ScriptSettings.TwitchReward5Name:
+    if e.RewardTitle == ScriptSettings.TwitchReward5Name and not ScriptSettings.TwitchReward5Name.isspace():
         if (ScriptSettings.TwitchReward5ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward5ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
             ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX5Path, ScriptSettings.SFX5Volume, ScriptSettings.SFX5Delay,)))
 
