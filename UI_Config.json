@@ -168,6 +168,7 @@
 		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
 		"group": "Twitch Reward 4 Event"
 	},
+
 	"TwitchReward5Name": {
 		"type": "textbox",
 		"value": "",
@@ -210,6 +211,437 @@
 		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
 		"group": "Twitch Reward 5 Event"
 	},
+
+	"TwitchReward6Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 6 Event"
+	},
+	"TwitchReward6ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 6 Event"
+	},
+	"SFX6Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 6 Event"
+	},
+	"SFX6Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 6 Event"
+	},
+	"SFX6Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 6 Event"
+	},
+
+	"TwitchReward7Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 7 Event"
+	},
+	"TwitchReward7ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 7 Event"
+	},
+	"SFX7Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 7 Event"
+	},
+	"SFX7Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 7 Event"
+	},
+	"SFX7Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 7 Event"
+	},
+
+	"TwitchReward8Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 8 Event"
+	},
+	"TwitchReward8ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 8 Event"
+	},
+	"SFX8Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 8 Event"
+	},
+	"SFX8Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 8 Event"
+	},
+	"SFX8Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 8 Event"
+	},
+
+	"TwitchReward9Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 9 Event"
+	},
+	"TwitchReward9ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 9 Event"
+	},
+	"SFX9Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 9 Event"
+	},
+	"SFX9Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 9 Event"
+	},
+	"SFX9Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 9 Event"
+	},
+
+	"TwitchReward10Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 10 Event"
+	},
+	"TwitchReward10ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 10 Event"
+	},
+	"SFX10Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 10 Event"
+	},
+	"SFX10Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 10 Event"
+	},
+	"SFX10Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 10 Event"
+	},
+
+	"TwitchReward11Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 11 Event"
+	},
+	"TwitchReward11ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 11 Event"
+	},
+	"SFX11Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 11 Event"
+	},
+	"SFX11Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 11 Event"
+	},
+	"SFX11Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 11 Event"
+	},
+
+	"TwitchReward12Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 12 Event"
+	},
+	"TwitchReward12ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 12 Event"
+	},
+	"SFX12Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 12 Event"
+	},
+	"SFX12Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 12 Event"
+	},
+	"SFX12Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 12 Event"
+	},
+
+	"TwitchReward13Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 13 Event"
+	},
+	"TwitchReward13ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 13 Event"
+	},
+	"SFX13Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 13 Event"
+	},
+	"SFX13Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 13 Event"
+	},
+	"SFX13Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 13 Event"
+	},
+
+	"TwitchReward14Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 14 Event"
+	},
+	"TwitchReward14ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 14 Event"
+	},
+	"SFX14Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 14 Event"
+	},
+	"SFX14Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 14 Event"
+	},
+	"SFX14Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 14 Event"
+	},
+
+	"TwitchReward15Name": {
+		"type": "textbox",
+		"value": "",
+		"label": "Title of Twitch Reward",
+		"tooltip": "Specify the name of the Twitch Reward that will trigger this event when detected.",
+		"group": "Twitch Reward 15 Event"
+	},
+	"TwitchReward15ActivationType": {
+		"type": "dropdown",
+		"label": "Activation Point",
+		"value": "Immediate",
+		"tooltip": "Set whether the reward should be triggered immediately on reward redemption by viewer, or when the reward is accepted/rejected from the reward queue. Note: twitch currently doesn't return a way to distinguish between Accept or Reject so Reject will still trigger the reward.",
+		"items": [
+			"Immediate",
+			"On Reward Queue Accept/Reject"
+		],
+		"group": "Twitch Reward 15 Event"
+	},
+	"SFX15Path": {
+		"type": "textbox",
+		"value": "",
+		"label": "Path to SFX file",
+		"tooltip": "Specify the path to the SFX effect to trigger.",
+		"group": "Twitch Reward 15 Event"
+	},
+	"SFX15Volume": {
+		"type": "slider",
+		"label": "SFX Volume",
+		"value": 100,
+		"min": 0,
+		"max": 100,
+		"ticks": 1,
+		"tooltip": "Specify the volume to the SFX effect to trigger.",
+		"group": "Twitch Reward 15 Event"
+	},
+	"SFX15Delay": {
+		"type": "numberbox",
+		"label": "SFX Delay in Seconds",
+		"value": 10,
+		"tooltip": "Specify the number of seconds to wait before attempting to play next SFX in queue after starting to play this SFX.",
+		"group": "Twitch Reward 15 Event"
+	},
+
 	"btnreadme": {
 		"type": "button",
 		"label": "open readme",

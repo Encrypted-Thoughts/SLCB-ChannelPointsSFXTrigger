@@ -32,6 +32,7 @@ EventReceiver = None
 ThreadQueue = []
 CurrentThread = None
 PlayNextAt = datetime.datetime.now()
+RewardCount = 15
 
 #---------------------------------------
 # Classes
@@ -43,31 +44,12 @@ class Settings(object):
                 self.__dict__ = json.load(f, encoding="utf-8")
         else:
             self.EnableDebug = False
-            self.TwitchReward1Name = ""
-            self.TwitchReward1ActivationType = "Immediate"
-            self.SFX1Path = ""
-            self.SFX1Volume = 100
-            self.SFX1Delay = 10
-            self.TwitchReward2Name = ""
-            self.TwitchReward2ActivationType = "Immediate"
-            self.SFX2Path = ""
-            self.SFX2Volume = 100
-            self.SFX2Delay = 10
-            self.TwitchReward3Name = ""
-            self.TwitchReward3ActivationType = "Immediate"
-            self.SFX3Path = ""
-            self.SFX3Volume = 100
-            self.SFX3Delay = 10
-            self.TwitchReward4Name = ""
-            self.TwitchReward4ActivationType = "Immediate"
-            self.SFX4Path = ""
-            self.SFX4Volume = 100
-            self.SFX4Delay = 10
-            self.TwitchReward5Name = ""
-            self.TwitchReward5ActivationType = "Immediate"
-            self.SFX5Path = ""
-            self.SFX5Volume = 100
-            self.SFX5Delay = 10
+            for i in range(1, RewardCount + 1):
+                setattr(self, "TwitchReward" + str(i) + "Name", "")
+                setattr(self, "TwitchReward" + str(i) + "ActivationType", "Immediate")
+                setattr(self, "SFX" + str(i) + "Path", "")
+                setattr(self, "SFX" + str(i) + "Volume", 100)
+                setattr(self, "SFX" + str(i) + "Delay", 10)
 
     def Reload(self, jsondata):
         self.__dict__ = json.loads(jsondata, encoding="utf-8")
@@ -229,21 +211,16 @@ def EventReceiverRewardRedeemed(sender, e):
     if ScriptSettings.EnableDebug:
         Parent.Log(ScriptName, "Event triggered: " + str(e.TimeStamp) + " ChannelId: " + str(e.ChannelId) + " Login: " + str(e.Login) + " DisplayName: " + str(e.DisplayName) + " Message: " + str(e.Message) + " RewardId: " + str(e.RewardId) + " RewardTitle: " + str(e.RewardTitle) + " RewardPrompt: " + str(e.RewardPrompt) + " RewardCost: " + str(e.RewardCost) + " Status: " + str(e.Status))
 
-    if e.RewardTitle == ScriptSettings.TwitchReward1Name and not ScriptSettings.TwitchReward1Name.isspace():
-        if (ScriptSettings.TwitchReward1ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward1ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
-            ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX1Path, ScriptSettings.SFX1Volume, ScriptSettings.SFX1Delay,)))
-    if e.RewardTitle == ScriptSettings.TwitchReward2Name and not ScriptSettings.TwitchReward2Name.isspace():
-        if (ScriptSettings.TwitchReward2ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward2ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
-            ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX2Path, ScriptSettings.SFX2Volume, ScriptSettings.SFX2Delay,)))
-    if e.RewardTitle == ScriptSettings.TwitchReward3Name and not ScriptSettings.TwitchReward3Name.isspace():
-        if (ScriptSettings.TwitchReward3ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward3ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
-            ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX3Path, ScriptSettings.SFX3Volume, ScriptSettings.SFX3Delay,)))
-    if e.RewardTitle == ScriptSettings.TwitchReward4Name and not ScriptSettings.TwitchReward4Name.isspace():
-        if (ScriptSettings.TwitchReward4ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward4ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
-            ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX4Path, ScriptSettings.SFX4Volume, ScriptSettings.SFX4Delay,)))
-    if e.RewardTitle == ScriptSettings.TwitchReward5Name and not ScriptSettings.TwitchReward5Name.isspace():
-        if (ScriptSettings.TwitchReward5ActivationType == "Immediate" and "FULFILLED" in e.Status) or (ScriptSettings.TwitchReward5ActivationType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
-            ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(ScriptSettings.SFX5Path, ScriptSettings.SFX5Volume, ScriptSettings.SFX5Delay,)))
+    Parent.Log(ScriptName, str(RewardCount))
+    for i in range(1, RewardCount + 1):
+        rewardName = getattr(ScriptSettings, "TwitchReward" + str(i) + "Name")
+        if e.RewardTitle ==  rewardName and not rewardName.isspace():
+            rewardType = getattr(ScriptSettings, "TwitchReward" + str(i) + "ActivationType")
+            if (rewardType == "Immediate" and "FULFILLED" in e.Status) or (rewardType == r"On Reward Queue Accept/Reject" and "ACTION_TAKEN" in e.Status):
+                ThreadQueue.append(threading.Thread(target=RewardRedeemedWorker,args=(
+                    getattr(ScriptSettings, "SFX" + str(i) + "Path"), 
+                    getattr(ScriptSettings, "SFX" + str(i) + "Volume"), 
+                    getattr(ScriptSettings, "SFX" + str(i) + "Delay"),)))
 
     return
 
